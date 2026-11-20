@@ -12,185 +12,318 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Sistem Manajemen Rental Kendaraan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Informasi Rental Kendaraan</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 20px; color: #333; }
-        .container { max-width: 1100px; margin: auto; }
-        h1 { text-align: center; color: #2c3e50; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-        .card h3 { margin-top: 0; border-bottom: 2px solid #3498db; padding-bottom: 8px; color: #2980b9; }
-        label { display: block; margin-top: 10px; font-weight: bold; font-size: 14px; }
-        input, select { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { margin-top: 15px; width: 100%; padding: 10px; background: #3498db; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        button:hover { background: #2980b9; }
-        table { width: 100%; border-collapse: collapse; background: #fff; margin-bottom: 25px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; font-size: 14px; }
-        th { background: #2c3e50; color: white; }
-        .badge-tersedia { background: #27ae60; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
-        .badge-disewa { background: #e74c3c; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { margin: 0; background: #f0f2f5; color: #333; }
+        
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: #fff;
+            padding: 14px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .navbar .brand { font-size: 18px; font-weight: bold; letter-spacing: 0.5px; }
+        .navbar .user-info { display: flex; align-items: center; gap: 15px; font-size: 14px; }
+        .badge-role { background: #3b82f6; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        .btn-logout {
+            background: #ef4444; color: #fff; text-decoration: none;
+            padding: 7px 14px; border-radius: 6px; font-weight: bold; font-size: 13px; transition: 0.2s;
+        }
+        .btn-logout:hover { background: #dc2626; }
+
+        .container { max-width: 1150px; margin: 25px auto; padding: 0 20px; }
+
+        /* Menu Ikon Admin */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+        .menu-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            transition: all 0.25s ease;
+        }
+        .menu-card:hover, .menu-card.active {
+            border-color: #2563eb;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.15);
+        }
+        .menu-icon { font-size: 36px; margin-bottom: 8px; display: block; }
+        .menu-title { font-weight: bold; font-size: 15px; color: #1e293b; }
+        .menu-desc { font-size: 12px; color: #64748b; margin-top: 4px; }
+
+        /* Card Umum & Form */
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .card h3 { margin-top: 0; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #475569; }
+        input, select {
+            width: 100%; padding: 10px; border: 1px solid #cbd5e1;
+            border-radius: 6px; font-size: 14px;
+        }
+        button.btn-primary {
+            background: #2563eb; color: #fff; border: none; padding: 11px 20px;
+            border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 14px;
+        }
+        button.btn-primary:hover { background: #1d4ed8; }
+
+        /* Tabel Admin */
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+        th, td { padding: 11px 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        th { background: #f8fafc; color: #334155; font-weight: 600; }
+        .status-tersedia { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .status-disewa { background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+
+        /* Katalog Kartu Khusus User */
+        .hero-user {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff; padding: 28px; border-radius: 14px; margin-bottom: 24px;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+        }
+        .hero-user h2 { margin: 0 0 6px 0; font-size: 24px; }
+        .hero-user p { margin: 0; opacity: 0.9; font-size: 14px; }
+        .vehicle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+        .vehicle-card {
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .vehicle-card:hover { transform: translateY(-4px); }
+        .vehicle-banner {
+            background: #f8fafc;
+            padding: 24px;
+            text-align: center;
+            font-size: 48px;
+            border-bottom: 1px solid #f1f5f9;
+            position: relative;
+        }
+        .badge-ready {
+            position: absolute; top: 12px; right: 12px;
+            background: #10b981; color: #fff; font-size: 11px;
+            padding: 4px 10px; border-radius: 20px; font-weight: bold;
+        }
+        .vehicle-body { padding: 18px; }
+        .vehicle-type { font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: bold; }
+        .vehicle-name { font-size: 18px; font-weight: bold; color: #0f172a; margin: 4px 0; }
+        .vehicle-plat {
+            display: inline-block; background: #e2e8f0; color: #334155;
+            padding: 3px 8px; border-radius: 4px; font-family: monospace; font-size: 13px; font-weight: bold;
+        }
+        .vehicle-footer {
+            padding: 14px 18px;
+            background: #f8fafc;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .price { color: #2563eb; font-weight: bold; font-size: 16px; }
+        .price span { font-size: 12px; color: #64748b; font-weight: normal; }
     </style>
+    <script>
+        function tampilkanFitur(idSection, el) {
+            const sections = document.querySelectorAll('.admin-section');
+            sections.forEach(sec => {
+                if (idSection === 'semua') {
+                    sec.style.display = 'block';
+                } else {
+                    sec.style.display = (sec.id === idSection) ? 'block' : 'none';
+                }
+            });
+            document.querySelectorAll('.menu-card').forEach(card => card.classList.remove('active'));
+            if (el) el.classList.add('active');
+        }
+    </script>
 </head>
 <body>
+
+<!-- NAVBAR (TAMPIL UNTUK ADMIN MAUPUN USER) -->
+<div class="navbar">
+    <div class="brand">🚘 Sistem Rental Kendaraan</div>
+    <div class="user-info">
+        <span>Halo, <strong><%= namaUser %></strong></span>
+        <span class="badge-role"><%= role %></span>
+        <a href="LoginServlet?action=logout" class="btn-logout">🚪 Logout</a>
+    </div>
+</div>
+
 <div class="container">
-    <h1>Sistem Manajemen Rental Kendaraan</h1>
 
-    <div class="grid">
-        <!-- Form 1: Tambah Pelanggan -->
-        <div class="card">
-            <h3>1. Tambah Pelanggan</h3>
-            <form action="rental" method="post">
-                <input type="hidden" name="aksi" value="tambah_pelanggan">
-                <label>Nama Lengkap</label>
-                <input type="text" name="nama_lengkap" required>
-                <label>No. KTP</label>
-                <input type="text" name="no_ktp" required>
-                <label>No. HP</label>
-                <input type="text" name="no_hp" required>
-                <label>Alamat</label>
-                <input type="text" name="alamat" required>
-                <button type="submit">Simpan Pelanggan</button>
-            </form>
+<% if ("admin".equals(role)) { %>
+    <!-- ================= TAMPILAN KHUSUS ADMIN ================= -->
+    <div class="menu-grid">
+        <div class="menu-card active" onclick="tampilkanFitur('semua', this)">
+            <span class="menu-icon">📊</span>
+            <div class="menu-title">Semua Panel</div>
+            <div class="menu-desc">Tampilkan seluruh menu & data</div>
         </div>
-
-        <!-- Form 2: Tambah Kendaraan -->
-        <div class="card">
-            <h3>2. Tambah Kendaraan</h3>
-            <form action="rental" method="post">
-                <input type="hidden" name="aksi" value="tambah_kendaraan">
-                <label>Jenis Kendaraan</label>
-                <select name="jenis_kendaraan" required>
-                    <option value="Mobil">Mobil</option>
-                    <option value="Motor">Motor</option>
-                </select>
-                <label>Merk & Tipe</label>
-                <input type="text" name="merk_tipe" placeholder="Contoh: Toyota Avanza / Honda Vario" required>
-                <label>Plat Nomor</label>
-                <input type="text" name="plat_nomor" placeholder="Contoh: DB 1234 AB" required>
-                <label>Harga Sewa / Hari (Rp)</label>
-                <input type="number" name="harga_per_hari" required>
-                <button type="submit">Simpan Kendaraan</button>
-            </form>
+        <div class="menu-card" onclick="tampilkanFitur('sec-pelanggan', this)">
+            <span class="menu-icon">👤</span>
+            <div class="menu-title">Tambah Pelanggan</div>
+            <div class="menu-desc">Registrasi & daftar penyewa</div>
         </div>
-
-        <!-- Form 3: Proses Rental -->
-        <div class="card">
-            <h3>3. Proses Rental Kendaraan</h3>
-            <form action="rental" method="post">
-                <input type="hidden" name="aksi" value="proses_rental">
-                <label>Pilih Pelanggan</label>
-                <select name="id_data_pelanggan" required>
-                    <%
-                        try (Connection conn = KoneksiDB.getConnection();
-                             Statement st = conn.createStatement();
-                             ResultSet rs = st.executeQuery("SELECT * FROM id_data_pelanggan")) {
-                            while (rs.next()) {
-                    %>
-                        <option value="<%= rs.getInt("id_data_pelanggan") %>"><%= rs.getString("nama_lengkap") %> (<%= rs.getString("no_ktp") %>)</option>
-                    <%      }
-                        } catch (Exception e) { out.println("<option>Error DB: " + e.getMessage() + "</option>"); }
-                    %>
-                </select>
-                <label>Pilih Kendaraan (Tersedia)</label>
-                <select name="id_kendaraan" required>
-                    <%
-                        try (Connection conn = KoneksiDB.getConnection();
-                             Statement st = conn.createStatement();
-                             ResultSet rs = st.executeQuery("SELECT * FROM data_kendaraan_rental WHERE status_kendaraan='Tersedia'")) {
-                            while (rs.next()) {
-                    %>
-                        <option value="<%= rs.getInt("id_kendaraan") %>">[<%= rs.getString("jenis_kendaraan") %>] <%= rs.getString("merk_tipe") %> - <%= rs.getString("plat_nomor") %> (Rp <%= String.format("%,.0f", rs.getBigDecimal("harga_per_hari")) %>/hari)</option>
-                    <%      }
-                        } catch (Exception e) { out.println("<option>Error DB</option>"); }
-                    %>
-                </select>
-                <label>Tanggal Pinjam</label>
-                <input type="date" name="tanggal_pinjam" required>
-                <label>Tanggal Kembali</label>
-                <input type="date" name="tanggal_kembali" required>
-                <button type="submit">Proses & Hitung Biaya</button>
-            </form>
+        <div class="menu-card" onclick="tampilkanFitur('sec-kendaraan', this)">
+            <span class="menu-icon">🚗</span>
+            <div class="menu-title">Tambah Kendaraan</div>
+            <div class="menu-desc">Kelola armada mobil & motor</div>
+        </div>
+        <div class="menu-card" onclick="tampilkanFitur('sec-transaksi', this)">
+            <span class="menu-icon">🧾</span>
+            <div class="menu-title">Transaksi & Riwayat</div>
+            <div class="menu-desc">Proses sewa & log transaksi</div>
         </div>
     </div>
 
-    <!-- Tabel Daftar Kendaraan -->
-    <h3>Daftar Kendaraan (Mobil & Motor)</h3>
-    <table>
-        <tr>
-            <th>ID</th><th>Jenis</th><th>Merk & Tipe</th><th>Plat Nomor</th><th>Harga / Hari</th><th>Status</th>
-        </tr>
-        <%
-            try (Connection conn = KoneksiDB.getConnection();
-                 Statement st = conn.createStatement();
-                 ResultSet rs = st.executeQuery("SELECT * FROM data_kendaraan_rental ORDER BY jenis_kendaraan, id_kendaraan")) {
-                while (rs.next()) {
-                    String status = rs.getString("status_kendaraan");
-        %>
-        <tr>
-            <td><%= rs.getInt("id_kendaraan") %></td>
-            <td><%= rs.getString("jenis_kendaraan") %></td>
-            <td><%= rs.getString("merk_tipe") %></td>
-            <td><%= rs.getString("plat_nomor") %></td>
-            <td>Rp <%= String.format("%,.0f", rs.getBigDecimal("harga_per_hari")) %></td>
-            <td><span class="<%= "Tersedia".equalsIgnoreCase(status) ? "badge-tersedia" : "badge-disewa" %>"><%= status %></span></td>
-        </tr>
-        <%      }
-            } catch (Exception e) { out.println("<tr><td colspan='6'>Gagal memuat data: " + e.getMessage() + "</td></tr>"); }
-        %>
-    </table>
+    <!-- 1. PANEL PELANGGAN -->
+    <div id="sec-pelanggan" class="card admin-section">
+        <h3>👤 Manajemen Data Pelanggan</h3>
+        <form action="rental" method="post">
+            <input type="hidden" name="aksi" value="tambah_pelanggan">
+            <div class="form-grid">
+                <div>
+                    <label>No. KTP</label>
+                    <input type="text" name="no_ktp" required placeholder="Contoh: 7171012345670001">
+                </div>
+                <div>
+                    <label>Nama Lengkap</label>
+                    <input type="text" name="nama_lengkap" required placeholder="Nama penyewa">
+                </div>
+                <div>
+                    <label>No. HP</label>
+                    <input type="text" name="no_hp" required placeholder="0812xxxxxxxx">
+                </div>
+                <div>
+                    <label>Alamat</label>
+                    <input type="text" name="alamat" required placeholder="Alamat domisili">
+                </div>
+            </div>
+            <button type="submit" class="btn-primary">+ Simpan Pelanggan</button>
+        </form>
 
-    <!-- Tabel Daftar Pelanggan -->
-    <h3>Daftar Pelanggan</h3>
-    <table>
-        <tr>
-            <th>ID</th><th>Nama Lengkap</th><th>No. KTP</th><th>No. HP</th><th>Alamat</th>
-        </tr>
-        <%
-            try (Connection conn = KoneksiDB.getConnection();
-                 Statement st = conn.createStatement();
-                 ResultSet rs = st.executeQuery("SELECT * FROM id_data_pelanggan")) {
-                while (rs.next()) {
-        %>
-        <tr>
-            <td><%= rs.getInt("id_data_pelanggan") %></td>
-            <td><%= rs.getString("nama_lengkap") %></td>
-            <td><%= rs.getString("no_ktp") %></td>
-            <td><%= rs.getString("no_hp") %></td>
-            <td><%= rs.getString("alamat") %></td>
-        </tr>
-        <%      }
-            } catch (Exception e) { out.println("<tr><td colspan='5'>Gagal memuat data: " + e.getMessage() + "</td></tr>"); }
-        %>
-    </table>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>No. KTP</th>
+                    <th>Nama Lengkap</th>
+                    <th>No. HP</th>
+                    <th>Alamat</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%
+                    try (Connection conn = KoneksiDB.getConnection();
+                         Statement st = conn.createStatement();
+                         ResultSet rs = st.executeQuery("SELECT * FROM id_data_pelanggan ORDER BY id_data_pelanggan DESC")) {
+                        while (rs.next()) {
+                %>
+                <tr>
+                    <td><%= rs.getInt("id_data_pelanggan") %></td>
+                    <td><%= rs.getString("no_ktp") %></td>
+                    <td><%= rs.getString("nama_lengkap") %></td>
+                    <td><%= rs.getString("no_hp") %></td>
+                    <td><%= rs.getString("alamat") %></td>
+                </tr>
+                <%      }
+                    } catch (Exception e) { out.println("<tr><td colspan='5'>Error: " + e.getMessage() + "</td></tr>"); }
+                %>
+            </tbody>
+        </table>
+    </div>
 
-    <!-- Tabel Riwayat Transaksi -->
-    <h3>Riwayat Transaksi Rental</h3>
-    <table>
-        <tr>
-            <th>ID Transaksi</th><th>Pelanggan</th><th>Kendaraan</th><th>Tgl Pinjam</th><th>Tgl Kembali</th><th>Lama Sewa</th><th>Total Biaya</th>
-        </tr>
-        <%
-            String sqlTrx = "SELECT t.*, p.nama_lengkap, k.jenis_kendaraan, k.merk_tipe, k.plat_nomor FROM transaksi_rental t " +
-                            "JOIN id_data_pelanggan p ON t.id_data_pelanggan = p.id_data_pelanggan " +
-                            "JOIN data_kendaraan_rental k ON t.id_kendaraan = k.id_kendaraan";
-            try (Connection conn = KoneksiDB.getConnection();
-                 Statement st = conn.createStatement();
-                 ResultSet rs = st.executeQuery(sqlTrx)) {
-                while (rs.next()) {
-        %>
-        <tr>
-            <td><%= rs.getInt("id_transaksi_rental") %></td>
-            <td><%= rs.getString("nama_lengkap") %></td>
-            <td>[<%= rs.getString("jenis_kendaraan") %>] <%= rs.getString("merk_tipe") %> (<%= rs.getString("plat_nomor") %>)</td>
-            <td><%= rs.getDate("tanggal_pinjam") %></td>
-            <td><%= rs.getDate("tanggal_kembali") %></td>
-            <td><%= rs.getInt("lama_sewa") %> hari</td>
-            <td><strong>Rp <%= String.format("%,.0f", rs.getBigDecimal("total_biaya_sewa")) %></strong></td>
-        </tr>
-        <%      }
-            } catch (Exception e) { out.println("<tr><td colspan='7'>Gagal memuat transaksi: " + e.getMessage() + "</td></tr>"); }
-        %>
-    </table>
-</div>
-</body>
-</html>
+    <!-- 2. PANEL KENDARAAN -->
+    <div id="sec-kendaraan" class="card admin-section">
+        <h3>🚗 Manajemen Armada Kendaraan</h3>
+        <form action="rental" method="post">
+            <input type="hidden" name="aksi" value="tambah_kendaraan">
+            <div class="form-grid">
+                <div>
+                    <label>Jenis Kendaraan</label>
+                    <select name="jenis_kendaraan" required>
+                        <option value="Mobil">Mobil</option>
+                        <option value="Motor">Motor</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Merk / Tipe Kendaraan</label>
+                    <input type="text" name="merk_tipe" required placeholder="Contoh: Toyota Avanza">
+                </div>
+                <div>
+                    <label>Plat Nomor</label>
+                    <input type="text" name="plat_nomor" required placeholder="Contoh: DB 1234 AB">
+                </div>
+                <div>
+                    <label>Harga Sewa / Hari (Rp)</label>
+                    <input type="number" name="harga_per_hari" required placeholder="350000">
+                </div>
+            </div>
+            <button type="submit" class="btn-primary">+ Tambah Armada</button>
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Jenis</th>
+                    <th>Merk / Tipe</th>
+                    <th>Plat Nomor</th>
+                    <th>Tarif / Hari</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%
+                    try (Connection conn = KoneksiDB.getConnection();
+                         Statement st = conn.createStatement();
+                         ResultSet rs = st.executeQuery("SELECT * FROM data_kendaraan_rental ORDER BY id_kendaraan DESC")) {
+                        while (rs.next()) {
+                            String status = rs.getString("status_kendaraan");
+                %>
+                <tr>
+                    <td><%= rs.getInt("id_kendaraan") %></td>
+                    <td><%= rs.getString("jenis_kendaraan") %></td>
+                    <td><%= rs.getString("merk_tipe") %></td>
+                    <td><strong><%= rs.getString("plat_nomor") %></strong></td>
+                    <td>Rp <%= String.format("%,.0f", rs.getBigDecimal("harga_per_hari")) %></td>
+                    <td>
+                        <span class="<%= "Tersedia".equalsIgnoreCase(status) ? "status-tersedia" : "status-disewa" %>">
+                            <%= status %>
+                        </span>
+                    </td>
+                </tr>
+                <%      }
+                    } catch (Exception e) { out.println("<tr><td colspan='6'>Error: " + e.getMessage() + "</td></tr>"); }
+                %>
+            </tbody>
+        </table>
+    </div>
+
+    <!--
