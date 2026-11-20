@@ -172,7 +172,9 @@
 
 <div class="container">
 
-<% if ("admin".equals(role)) { %>
+<%
+    if ("admin".equals(role)) {
+%>
     <div class="menu-grid">
         <div class="menu-card active" onclick="tampilkanFitur('semua', this)">
             <span class="menu-icon">&#128202;</span>
@@ -245,8 +247,11 @@
                     <td><%= rs.getString("no_hp") %></td>
                     <td><%= rs.getString("alamat") %></td>
                 </tr>
-                <%      }
-                    } catch (Exception e) { out.println("<tr><td colspan='5'>Error: " + e.getMessage() + "</td></tr>"); }
+                <%
+                        }
+                    } catch (Exception e) {
+                        out.println("<tr><td colspan='5'>Error: " + e.getMessage() + "</td></tr>");
+                    }
                 %>
             </tbody>
         </table>
@@ -266,4 +271,215 @@
                 </div>
                 <div>
                     <label>Merk / Tipe Kendaraan</label>
-                    <input type="text" name="merk_tipe" required placeholder="
+                    <input type="text" name="merk_tipe" required placeholder="Contoh: Toyota Avanza">
+                </div>
+                <div>
+                    <label>Plat Nomor</label>
+                    <input type="text" name="plat_nomor" required placeholder="Contoh: DB 1234 AB">
+                </div>
+                <div>
+                    <label>Harga Sewa / Hari (Rp)</label>
+                    <input type="number" name="harga_per_hari" required placeholder="350000">
+                </div>
+            </div>
+            <button type="submit" class="btn-primary">+ Tambah Armada</button>
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Jenis</th>
+                    <th>Merk / Tipe</th>
+                    <th>Plat Nomor</th>
+                    <th>Tarif / Hari</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%
+                    try (Connection conn = KoneksiDB.getConnection();
+                         Statement st = conn.createStatement();
+                         ResultSet rs = st.executeQuery("SELECT * FROM data_kendaraan_rental ORDER BY id_kendaraan DESC")) {
+                        while (rs.next()) {
+                            String status = rs.getString("status_kendaraan");
+                            BigDecimal harga = rs.getBigDecimal("harga_per_hari");
+                %>
+                <tr>
+                    <td><%= rs.getInt("id_kendaraan") %></td>
+                    <td><%= rs.getString("jenis_kendaraan") %></td>
+                    <td><%= rs.getString("merk_tipe") %></td>
+                    <td><strong><%= rs.getString("plat_nomor") %></strong></td>
+                    <td>Rp <%= (harga != null) ? nf.format(harga) : "0" %></td>
+                    <td>
+                        <span class="<%= "Tersedia".equalsIgnoreCase(status) ? "status-tersedia" : "status-disewa" %>">
+                            <%= status %>
+                        </span>
+                    </td>
+                </tr>
+                <%
+                        }
+                    } catch (Exception e) {
+                        out.println("<tr><td colspan='6'>Error: " + e.getMessage() + "</td></tr>");
+                    }
+                %>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="sec-transaksi" class="card admin-section">
+        <h3>Transaksi Penyewaan &amp; Riwayat</h3>
+        <form action="rental" method="post">
+            <input type="hidden" name="aksi" value="proses_rental">
+            <div class="form-grid">
+                <div>
+                    <label>Pilih Pelanggan</label>
+                    <select name="id_data_pelanggan" required>
+                        <%
+                            try (Connection conn = KoneksiDB.getConnection();
+                                 Statement st = conn.createStatement();
+                                 ResultSet rs = st.executeQuery("SELECT id_data_pelanggan, nama_lengkap, no_ktp FROM id_data_pelanggan")) {
+                                while (rs.next()) {
+                        %>
+                        <option value="<%= rs.getInt("id_data_pelanggan") %>">
+                            <%= rs.getString("nama_lengkap") %> (<%= rs.getString("no_ktp") %>)
+                        </option>
+                        <%
+                                }
+                            } catch (Exception e) { }
+                        %>
+                    </select>
+                </div>
+                <div>
+                    <label>Pilih Kendaraan (Tersedia)</label>
+                    <select name="id_kendaraan" required>
+                        <%
+                            try (Connection conn = KoneksiDB.getConnection();
+                                 Statement st = conn.createStatement();
+                                 ResultSet rs = st.executeQuery("SELECT id_kendaraan, merk_tipe, plat_nomor, harga_per_hari FROM data_kendaraan_rental WHERE status_kendaraan = 'Tersedia'")) {
+                                while (rs.next()) {
+                                    BigDecimal hrg = rs.getBigDecimal("harga_per_hari");
+                        %>
+                        <option value="<%= rs.getInt("id_kendaraan") %>">
+                            <%= rs.getString("merk_tipe") %> - <%= rs.getString("plat_nomor") %> (Rp <%= (hrg != null) ? nf.format(hrg) : "0" %>/hari)
+                        </option>
+                        <%
+                                }
+                            } catch (Exception e) { }
+                        %>
+                    </select>
+                </div>
+                <div>
+                    <label>Tanggal Pinjam</label>
+                    <input type="date" name="tanggal_pinjam" required>
+                </div>
+                <div>
+                    <label>Tanggal Kembali</label>
+                    <input type="date" name="tanggal_kembali" required>
+                </div>
+            </div>
+            <button type="submit" class="btn-primary">Proses Transaksi Sewa</button>
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Transaksi</th>
+                    <th>Pelanggan</th>
+                    <th>Kendaraan</th>
+                    <th>Tgl Pinjam</th>
+                    <th>Tgl Kembali</th>
+                    <th>Lama</th>
+                    <th>Total Biaya</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%
+                    String sqlTrans = "SELECT t.id_transaksi, p.nama_lengkap, k.merk_tipe, k.plat_nomor, t.tanggal_pinjam, t.tanggal_kembali, t.lama_sewa, t.total_biaya_sewa " +
+                                      "FROM transaksi_rental t " +
+                                      "JOIN id_data_pelanggan p ON t.id_data_pelanggan = p.id_data_pelanggan " +
+                                      "JOIN data_kendaraan_rental k ON t.id_kendaraan = k.id_kendaraan " +
+                                      "ORDER BY t.id_transaksi DESC";
+                    try (Connection conn = KoneksiDB.getConnection();
+                         Statement st = conn.createStatement();
+                         ResultSet rs = st.executeQuery(sqlTrans)) {
+                        while (rs.next()) {
+                            BigDecimal total = rs.getBigDecimal("total_biaya_sewa");
+                %>
+                <tr>
+                    <td>#<%= rs.getInt("id_transaksi") %></td>
+                    <td><%= rs.getString("nama_lengkap") %></td>
+                    <td><%= rs.getString("merk_tipe") %> (<%= rs.getString("plat_nomor") %>)</td>
+                    <td><%= rs.getDate("tanggal_pinjam") %></td>
+                    <td><%= rs.getDate("tanggal_kembali") %></td>
+                    <td><%= rs.getInt("lama_sewa") %> hari</td>
+                    <td><strong>Rp <%= (total != null) ? nf.format(total) : "0" %></strong></td>
+                </tr>
+                <%
+                        }
+                    } catch (Exception e) {
+                        out.println("<tr><td colspan='7'>Belum ada transaksi atau error: " + e.getMessage() + "</td></tr>");
+                    }
+                %>
+            </tbody>
+        </table>
+    </div>
+<%
+    } else {
+%>
+    <div class="hero-user">
+        <h2>Katalog Armada Kendaraan Tersedia</h2>
+        <p>Pilih mobil atau motor siap pakai berikut untuk melakukan pemesanan langsung melalui petugas rental kami.</p>
+    </div>
+
+    <div class="vehicle-grid">
+        <%
+            boolean adaUnit = false;
+            try (Connection conn = KoneksiDB.getConnection();
+                 Statement st = conn.createStatement();
+                 ResultSet rs = st.executeQuery("SELECT * FROM data_kendaraan_rental WHERE status_kendaraan = 'Tersedia' ORDER BY jenis_kendaraan, merk_tipe")) {
+                while (rs.next()) {
+                    adaUnit = true;
+                    String jenis = rs.getString("jenis_kendaraan");
+                    String ikon = "Motor".equalsIgnoreCase(jenis) ? "&#127949;" : "&#128663;";
+                    BigDecimal hargaUnit = rs.getBigDecimal("harga_per_hari");
+        %>
+        <div class="vehicle-card">
+            <div class="vehicle-banner">
+                <span class="badge-ready">&#9679; TERSEDIA</span>
+                <%= ikon %>
+            </div>
+            <div class="vehicle-body">
+                <div class="vehicle-type"><%= jenis %></div>
+                <div class="vehicle-name"><%= rs.getString("merk_tipe") %></div>
+                <div class="vehicle-plat"><%= rs.getString("plat_nomor") %></div>
+            </div>
+            <div class="vehicle-footer">
+                <div class="price">
+                    Rp <%= (hargaUnit != null) ? nf.format(hargaUnit) : "0" %> <span>/ hari</span>
+                </div>
+                <span style="font-size:12px; color:#10b981; font-weight:bold;">Siap Sewa</span>
+            </div>
+        </div>
+        <%
+                }
+            } catch (Exception e) {
+                out.println("<p>Gagal memuat armada: " + e.getMessage() + "</p>");
+            }
+            if (!adaUnit) {
+        %>
+        <div class="card" style="grid-column: 1 / -1; text-align: center;">
+            <h3>Maaf, saat ini semua unit kendaraan sedang disewa.</h3>
+            <p>Silakan cek kembali beberapa saat lagi.</p>
+        </div>
+        <%
+            }
+        %>
+    </div>
+<%
+    }
+%>
+
+</div>
+</body>
+</html>
