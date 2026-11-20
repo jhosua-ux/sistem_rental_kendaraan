@@ -1,5 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*, java.math.BigDecimal, com.rental.KoneksiDB" %>
+<%
+    if (session.getAttribute("username") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+    String role = (String) session.getAttribute("role");
+    String namaUser = (String) session.getAttribute("nama_lengkap");
+%>
 <!DOCTYPE html>
 <html lang="id">
 <head>
