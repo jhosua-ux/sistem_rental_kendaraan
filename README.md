@@ -28,5 +28,5 @@ Aplikasi manajemen penyewaan kendaraan (Mobil & Motor) berbasis web yang dikemba
 ## Cara Instalasi Lokal (Setup Guide)
 1. **Clone Repositori:**
    ```bash
-   git clone [https://github.com/USERNAME_ANDA/NAMA_REPO_ANDA.git](https://github.com/USERNAME_ANDA/NAMA_REPO_ANDA.git)
-   cd NAMA_REPO_ANDA
+   git clone [https://github.com/jhosua-ux/sistem_rental_kendaraan.git](https://github.com/jhosua-ux/sistem_rental_kendaraan.git)
+   cd sistem_rental_kendaraan
