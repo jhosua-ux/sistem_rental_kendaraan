@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.sql.*, java.math.BigDecimal, com.rental.KoneksiDB" %>
+<%@ page import="java.sql.*, java.math.BigDecimal, java.text.NumberFormat, java.util.Locale, com.rental.KoneksiDB" %>
 <%
     if (session.getAttribute("username") == null) {
         response.sendRedirect("login.jsp");
@@ -7,6 +7,7 @@
     }
     String role = (String) session.getAttribute("role");
     String namaUser = (String) session.getAttribute("nama_lengkap");
+    NumberFormat nf = NumberFormat.getInstance(new Locale("id", "ID"));
 %>
 <!DOCTYPE html>
 <html lang="id">
@@ -18,7 +19,6 @@
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { margin: 0; background: #f0f2f5; color: #333; }
         
-        /* Navbar */
         .navbar {
             background: linear-gradient(135deg, #1e293b, #0f172a);
             color: #fff;
@@ -28,18 +28,17 @@
             align-items: center;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
-        .navbar .brand { font-size: 18px; font-weight: bold; letter-spacing: 0.5px; }
+        .navbar .brand { font-size: 18px; font-weight: bold; }
         .navbar .user-info { display: flex; align-items: center; gap: 15px; font-size: 14px; }
         .badge-role { background: #3b82f6; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
         .btn-logout {
             background: #ef4444; color: #fff; text-decoration: none;
-            padding: 7px 14px; border-radius: 6px; font-weight: bold; font-size: 13px; transition: 0.2s;
+            padding: 7px 14px; border-radius: 6px; font-weight: bold; font-size: 13px;
         }
         .btn-logout:hover { background: #dc2626; }
 
         .container { max-width: 1150px; margin: 25px auto; padding: 0 20px; }
 
-        /* Menu Ikon Admin */
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -65,7 +64,6 @@
         .menu-title { font-weight: bold; font-size: 15px; color: #1e293b; }
         .menu-desc { font-size: 12px; color: #64748b; margin-top: 4px; }
 
-        /* Card Umum & Form */
         .card {
             background: #fff;
             border-radius: 12px;
@@ -86,14 +84,12 @@
         }
         button.btn-primary:hover { background: #1d4ed8; }
 
-        /* Tabel Admin */
         table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
         th, td { padding: 11px 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
         th { background: #f8fafc; color: #334155; font-weight: 600; }
         .status-tersedia { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         .status-disewa { background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
 
-        /* Katalog Kartu Khusus User */
         .hero-user {
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: #fff; padding: 28px; border-radius: 14px; margin-bottom: 24px;
@@ -165,46 +161,43 @@
 </head>
 <body>
 
-<!-- NAVBAR (TAMPIL UNTUK ADMIN MAUPUN USER) -->
 <div class="navbar">
-    <div class="brand">🚘 Sistem Rental Kendaraan</div>
+    <div class="brand">Sistem Rental Kendaraan</div>
     <div class="user-info">
         <span>Halo, <strong><%= namaUser %></strong></span>
         <span class="badge-role"><%= role %></span>
-        <a href="LoginServlet?action=logout" class="btn-logout">🚪 Logout</a>
+        <a href="LoginServlet?action=logout" class="btn-logout">Logout</a>
     </div>
 </div>
 
 <div class="container">
 
 <% if ("admin".equals(role)) { %>
-    <!-- ================= TAMPILAN KHUSUS ADMIN ================= -->
     <div class="menu-grid">
         <div class="menu-card active" onclick="tampilkanFitur('semua', this)">
-            <span class="menu-icon">📊</span>
+            <span class="menu-icon">&#128202;</span>
             <div class="menu-title">Semua Panel</div>
-            <div class="menu-desc">Tampilkan seluruh menu & data</div>
+            <div class="menu-desc">Tampilkan seluruh menu &amp; data</div>
         </div>
         <div class="menu-card" onclick="tampilkanFitur('sec-pelanggan', this)">
-            <span class="menu-icon">👤</span>
+            <span class="menu-icon">&#128100;</span>
             <div class="menu-title">Tambah Pelanggan</div>
-            <div class="menu-desc">Registrasi & daftar penyewa</div>
+            <div class="menu-desc">Registrasi &amp; daftar penyewa</div>
         </div>
         <div class="menu-card" onclick="tampilkanFitur('sec-kendaraan', this)">
-            <span class="menu-icon">🚗</span>
+            <span class="menu-icon">&#128663;</span>
             <div class="menu-title">Tambah Kendaraan</div>
-            <div class="menu-desc">Kelola armada mobil & motor</div>
+            <div class="menu-desc">Kelola armada mobil &amp; motor</div>
         </div>
         <div class="menu-card" onclick="tampilkanFitur('sec-transaksi', this)">
-            <span class="menu-icon">🧾</span>
-            <div class="menu-title">Transaksi & Riwayat</div>
-            <div class="menu-desc">Proses sewa & log transaksi</div>
+            <span class="menu-icon">&#129534;</span>
+            <div class="menu-title">Transaksi &amp; Riwayat</div>
+            <div class="menu-desc">Proses sewa &amp; log transaksi</div>
         </div>
     </div>
 
-    <!-- 1. PANEL PELANGGAN -->
     <div id="sec-pelanggan" class="card admin-section">
-        <h3>👤 Manajemen Data Pelanggan</h3>
+        <h3>Manajemen Data Pelanggan</h3>
         <form action="rental" method="post">
             <input type="hidden" name="aksi" value="tambah_pelanggan">
             <div class="form-grid">
@@ -259,9 +252,8 @@
         </table>
     </div>
 
-    <!-- 2. PANEL KENDARAAN -->
     <div id="sec-kendaraan" class="card admin-section">
-        <h3>🚗 Manajemen Armada Kendaraan</h3>
+        <h3>Manajemen Armada Kendaraan</h3>
         <form action="rental" method="post">
             <input type="hidden" name="aksi" value="tambah_kendaraan">
             <div class="form-grid">
@@ -274,56 +266,4 @@
                 </div>
                 <div>
                     <label>Merk / Tipe Kendaraan</label>
-                    <input type="text" name="merk_tipe" required placeholder="Contoh: Toyota Avanza">
-                </div>
-                <div>
-                    <label>Plat Nomor</label>
-                    <input type="text" name="plat_nomor" required placeholder="Contoh: DB 1234 AB">
-                </div>
-                <div>
-                    <label>Harga Sewa / Hari (Rp)</label>
-                    <input type="number" name="harga_per_hari" required placeholder="350000">
-                </div>
-            </div>
-            <button type="submit" class="btn-primary">+ Tambah Armada</button>
-        </form>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Jenis</th>
-                    <th>Merk / Tipe</th>
-                    <th>Plat Nomor</th>
-                    <th>Tarif / Hari</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <%
-                    try (Connection conn = KoneksiDB.getConnection();
-                         Statement st = conn.createStatement();
-                         ResultSet rs = st.executeQuery("SELECT * FROM data_kendaraan_rental ORDER BY id_kendaraan DESC")) {
-                        while (rs.next()) {
-                            String status = rs.getString("status_kendaraan");
-                %>
-                <tr>
-                    <td><%= rs.getInt("id_kendaraan") %></td>
-                    <td><%= rs.getString("jenis_kendaraan") %></td>
-                    <td><%= rs.getString("merk_tipe") %></td>
-                    <td><strong><%= rs.getString("plat_nomor") %></strong></td>
-                    <td>Rp <%= String.format("%,.0f", rs.getBigDecimal("harga_per_hari")) %></td>
-                    <td>
-                        <span class="<%= "Tersedia".equalsIgnoreCase(status) ? "status-tersedia" : "status-disewa" %>">
-                            <%= status %>
-                        </span>
-                    </td>
-                </tr>
-                <%      }
-                    } catch (Exception e) { out.println("<tr><td colspan='6'>Error: " + e.getMessage() + "</td></tr>"); }
-                %>
-            </tbody>
-        </table>
-    </div>
-
-    <!--
+                    <input type="text" name="merk_tipe" required placeholder="
